@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/HBMyEclipse/!svn/ver/122/FamousManAPI/src/API
+END
+DeregisterAll.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/DeregisterAll.java
+END
+GetInfoSub.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/GetInfoSub.java
+END
+ChangeMSISDN.java
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/ChangeMSISDN.java
+END
+GetTransaction.java
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/GetTransaction.java
+END
+Deregister.java
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/Deregister.java
+END
+GetInfoAllSub.java
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/GetInfoAllSub.java
+END
+Register.java
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/HBMyEclipse/!svn/ver/128/FamousManAPI/src/API/Register.java
+END
