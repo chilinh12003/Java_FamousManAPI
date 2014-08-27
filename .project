@@ -3,6 +3,8 @@
 	<name>TPTTAPI</name>
 	<comment></comment>
 	<projects>
+		<project>FamousMan</project>
+		<project>MyLibrary</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

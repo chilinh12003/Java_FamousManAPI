@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="MTrafficAPI">
+    <wb-module deploy-name="FamousManAPI">
         <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <dependent-module archiveName="MyUtility.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyUtility/MyUtility">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="MyConnection.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyConnection/MyConnection">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
-        <dependent-module archiveName="MyDataProcess.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyDataProcess/MyDataProcess">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/FamousMan/FamousMan">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="MyLibrary.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyLibrary/MyLibrary">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="sun.misc.BASE64Decoder.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/sun.misc.BASE64Decoder.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-logging-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/Proxool/commons-logging-1.1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="proxool-0.9.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/Proxool/proxool-0.9.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-1.2.17.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/log4j-1.2.17.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="proxool-cglib.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/Proxool/proxool-cglib.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="sqljdbc4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/sqljdbc4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="mysql-connector-java-5.1.22-bin.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/3.lib/mysql-connector-java-5.1.22-bin.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="/MTrafficAPI"/>
