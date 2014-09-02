@@ -201,7 +201,7 @@ public class CurrentData
 		if (Current_SuggestCountObj != null) Current_SuggestCountObj.clear();
 
 		SuggestCount mSuggestCount = new SuggestCount(LocalConfig.mDBConfig_MSSQL);
-		MyTableModel mTable = mSuggestCount.Select(2, Get_Current_QuestionObj().QuestionID.toString());
+		MyTableModel mTable = mSuggestCount.Select(2, Integer.toString(Get_Current_QuestionObj().QuestionID));
 		if (mTable != null && mTable.GetRowCount() > 1)
 		{
 			Current_SuggestCountObj = SuggestCountObject.ConvertToList(mTable);
@@ -213,7 +213,7 @@ public class CurrentData
 		// bằng table Suggest
 		Suggest mSuggest = new Suggest(LocalConfig.mDBConfig_MSSQL);
 
-		mTable = mSuggest.Select(2, Get_Current_QuestionObj().QuestionID.toString());
+		mTable = mSuggest.Select(2,Integer.toString(Get_Current_QuestionObj().QuestionID));
 
 		for (int i = 0; i < mTable.GetRowCount(); i++)
 		{
@@ -264,7 +264,7 @@ public class CurrentData
 
 		Suggest mSuggest = new Suggest(LocalConfig.mDBConfig_MSSQL);
 
-		MyTableModel mTable = mSuggest.Select(2, Get_Current_QuestionObj().QuestionID.toString());
+		MyTableModel mTable = mSuggest.Select(2, Integer.toString(Get_Current_QuestionObj().QuestionID));
 
 		Current_SuggestObj = SuggestObject.ConvertToList(mTable);
 		return Current_SuggestObj;

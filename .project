@@ -5,6 +5,7 @@
 	<projects>
 		<project>FamousMan</project>
 		<project>MyLibrary</project>
+		<project>MyDataProcess</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
