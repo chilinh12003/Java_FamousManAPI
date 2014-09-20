@@ -71,7 +71,7 @@ public class ProRegister
 	}
 
 	MyLogger mLog = new MyLogger(LocalConfig.LogConfigPath, this.getClass().toString());
-	
+
 	String MSISDN = "";
 	String RequestID = "";
 	String PackageName = "";
@@ -119,8 +119,8 @@ public class ProRegister
 
 	Integer PID = 0;
 
-	public ProRegister(String MSISDN, String RequestID, String PackageName, String Promotion, String Trial, String Bundle, String Note, String Channel,
-			String AppName, String UserName, String IP) throws Exception
+	public ProRegister(String MSISDN, String RequestID, String PackageName, String Promotion, String Trial,
+			String Bundle, String Note, String Channel, String AppName, String UserName, String IP) throws Exception
 	{
 		this.MSISDN = MSISDN.trim();
 		this.RequestID = RequestID.trim();
@@ -216,7 +216,8 @@ public class ProRegister
 	{
 		mCal_Expire = Calendar.getInstance();
 		mCal_Expire.set(Calendar.MILLISECOND, 0);
-		mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH), mCal_Current.get(Calendar.DATE), 23, 59, 59);
+		mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+				mCal_Current.get(Calendar.DATE), 23, 59, 59);
 		if (mPromoObj.mAdvertiseType == AdvertiseType.Bundle)
 		{
 			if (mPromoObj.mBundleType == BundleType.NeverExpire)
@@ -229,7 +230,7 @@ public class ProRegister
 		{
 			if (mPromoObj.mTrialType == TrialType.Day)
 			{
-				mCal_Expire.add(Calendar.DATE, mPromoObj.TrialNumberFree);
+				mCal_Expire.add(Calendar.DATE, mPromoObj.TrialNumberFree - 1);
 				FreeTime = "" + mPromoObj.TrialNumberFree + " ngay";
 			}
 			else if (mPromoObj.mTrialType == TrialType.Week)
@@ -248,7 +249,7 @@ public class ProRegister
 		{
 			if (mPromoObj.mPromotionType == PromotionType.Day)
 			{
-				mCal_Expire.add(Calendar.DATE, mPromoObj.PromotionNumberFree);
+				mCal_Expire.add(Calendar.DATE, mPromoObj.PromotionNumberFree - 1);
 				FreeTime = "" + mPromoObj.PromotionNumberFree + " ngay";
 			}
 			else if (mPromoObj.mPromotionType == PromotionType.Week)
@@ -276,15 +277,15 @@ public class ProRegister
 
 			MTContent = Common.GetDefineMT_Message(mMTType, FreeTime);
 
-			//Không gửi MT cho KH khi đăng ký từ kệnh VASVOUCHER (xem kịch bản)
-			if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+			// Không gửi MT cho KH khi đăng ký từ kệnh VASVOUCHER (xem kịch bản)
+			if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 			{
-				AddToMOLog(mMTType, "[Khong gui]"+MTContent);
+				AddToMOLog(mMTType, "[Khong gui]" + MTContent);
 			}
 			else
 			{
-			if (Common.SendMT(MSISDN, Keyword, MTContent, RequestID))
-				AddToMOLog(mMTType, MTContent);
+				if (Common.SendMT(MSISDN, Keyword, MTContent, RequestID))
+					AddToMOLog(mMTType, MTContent);
 			}
 
 		}
@@ -308,7 +309,8 @@ public class ProRegister
 			mTable_Sub = CurrentData.GetTable_Sub();
 
 			mCal_Expire.set(Calendar.MILLISECOND, 0);
-			mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH), mCal_Current.get(Calendar.DATE), 23, 59, 59);
+			mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+					mCal_Current.get(Calendar.DATE), 23, 59, 59);
 
 		}
 		catch (Exception ex)
@@ -321,8 +323,8 @@ public class ProRegister
 	{
 		try
 		{
-			MOObject mMOObj = new MOObject(MSISDN, mChannel, mMTType_Current, Keyword, MTContent_Current, RequestID, PID, mCal_Current.getTime(), Calendar
-					.getInstance().getTime(), mVNPApp, UserName, IP, PartnerID);
+			MOObject mMOObj = new MOObject(MSISDN, mChannel, mMTType_Current, Keyword, MTContent_Current, RequestID,
+					PID, mCal_Current.getTime(), Calendar.getInstance().getTime(), mVNPApp, UserName, IP, PartnerID);
 
 			mTable_MOLog = mMOObj.AddNewRow(mTable_MOLog);
 		}
@@ -350,7 +352,7 @@ public class ProRegister
 
 		switch (mInitType)
 		{
-			case NewReg:
+			case NewReg :
 				mSubObj = new SubscriberObject();
 				mSubObj.MSISDN = MSISDN;
 				mSubObj.FirstDate = mCal_Current.getTime();
@@ -379,7 +381,7 @@ public class ProRegister
 				mSubObj.IP = IP;
 
 				break;
-			case RegAgain:
+			case RegAgain :
 				// mSubObj = new SubscriberObject();
 				// mSubObj.MSISDN=mMsgObject.getUserid();
 				// mSubObj.FirstDate= mCal_Current.getTime();
@@ -412,7 +414,7 @@ public class ProRegister
 				mSubObj.UserName = UserName;
 				mSubObj.IP = IP;
 				break;
-			case UndoReg:
+			case UndoReg :
 				// mSubObj = new SubscriberObject();
 				// mSubObj.MSISDN=mMsgObject.getUserid();
 				// mSubObj.FirstDate= mCal_Current.getTime();
@@ -553,11 +555,11 @@ public class ProRegister
 						{
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -592,11 +594,11 @@ public class ProRegister
 
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -633,11 +635,11 @@ public class ProRegister
 
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -676,11 +678,11 @@ public class ProRegister
 
 						mMTType = MTType.RegCCOSSuccessFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
 					}
@@ -718,11 +720,11 @@ public class ProRegister
 
 						mMTType = MTType.RegCCOSSuccessFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
 					}
@@ -768,11 +770,11 @@ public class ProRegister
 
 						mMTType = MTType.RegCCOSSuccessNotFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessNotFree;
 					}
-					else if(mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessNotFree;
 					}
