@@ -16,6 +16,7 @@ import uti.utility.MyCheck;
 import uti.utility.MyConfig;
 import uti.utility.MyLogger;
 import uti.utility.MyText;
+import uti.utility.VNPApplication;
 import dat.content.DefineMT;
 import dat.gateway.ems_send_queue;
 import dat.sub.Subscriber;
@@ -182,18 +183,9 @@ public class Common
 	 * @param AppName
 	 * @return
 	 */
-	public static MyConfig.VNPApplication GetApplication(String AppName)
+	public static VNPApplication GetApplication(String AppName)
 	{
-
-		try
-		{
-			return MyConfig.VNPApplication.valueOf(AppName.toUpperCase());
-		}
-		catch (Exception ex)
-		{
-			mLog.log.error(ex);
-		}
-		return MyConfig.VNPApplication.NoThing;
+		return VNPApplication.valueOf(AppName.toUpperCase());
 	}
 
 	/**

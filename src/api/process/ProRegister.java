@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 import uti.utility.MyConfig;
 import uti.utility.MyConfig.ChannelType;
-import uti.utility.MyConfig.VNPApplication;
+import uti.utility.VNPApplication;
 import uti.utility.MyConvert;
 import uti.utility.MyLogger;
 import api.process.Charge.ErrorCode;
@@ -17,6 +17,7 @@ import dat.content.DefineMT.MTType;
 import dat.content.Keyword;
 import dat.history.MOLog;
 import dat.history.MOObject;
+import dat.history.WapRegLog;
 import dat.sub.Subscriber;
 import dat.sub.Subscriber.Status;
 import dat.sub.SubscriberObject;
@@ -100,22 +101,18 @@ public class ProRegister
 
 	MyTableModel mTable_MOLog = null;
 	MyTableModel mTable_Sub = null;
+	MyTableModel mTable_WapRegLog = null;
 
 	Charge mCharge = new Charge();
 	DefineMT.MTType mMTType = MTType.RegFail;
 
 	String MTContent = "";
 
-	/**
-	 * ID của đối tác, khi đăng ký qua các kênh của đối tác
-	 */
-	Integer PartnerID = 0;
-
 	// Thời gian miễn phí để chèn vào MT trả về cho khách hàng
 	String FreeTime = "ngay dau tien";
 
 	MyConfig.ChannelType mChannel = ChannelType.NOTHING;
-	MyConfig.VNPApplication mVNPApp = VNPApplication.NoThing;
+	VNPApplication mVNPApp = new VNPApplication();
 
 	Integer PID = 0;
 
@@ -278,7 +275,7 @@ public class ProRegister
 			MTContent = Common.GetDefineMT_Message(mMTType, FreeTime);
 
 			// Không gửi MT cho KH khi đăng ký từ kệnh VASVOUCHER (xem kịch bản)
-			if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+			if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 			{
 				AddToMOLog(mMTType, "[Khong gui]" + MTContent);
 			}
@@ -324,7 +321,8 @@ public class ProRegister
 		try
 		{
 			MOObject mMOObj = new MOObject(MSISDN, mChannel, mMTType_Current, Keyword, MTContent_Current, RequestID,
-					PID, mCal_Current.getTime(), Calendar.getInstance().getTime(), mVNPApp, UserName, IP, PartnerID);
+					PID, mCal_Current.getTime(), Calendar.getInstance().getTime(), mVNPApp, UserName, IP,
+					mSubObj.PartnerID);
 
 			mTable_MOLog = mMOObj.AddNewRow(mTable_MOLog);
 		}
@@ -375,7 +373,7 @@ public class ProRegister
 				 * mSubObj.AnswerByDay= mSubObj.LastAnswerDate=
 				 * mSubObj.DeregDate=
 				 */
-				mSubObj.PartnerID = PartnerID;
+				mSubObj.PartnerID = mSubObj.PartnerID = GetPartnerID();
 				mSubObj.mVNPApp = mVNPApp;
 				mSubObj.UserName = UserName;
 				mSubObj.IP = IP;
@@ -409,7 +407,7 @@ public class ProRegister
 				mSubObj.LastAnswerDate = null;
 				// mSubObj.DeregDate=
 
-				mSubObj.PartnerID = PartnerID;
+				mSubObj.PartnerID = mSubObj.PartnerID = GetPartnerID();
 				mSubObj.mVNPApp = mVNPApp;
 				mSubObj.UserName = UserName;
 				mSubObj.IP = IP;
@@ -438,10 +436,12 @@ public class ProRegister
 				mSubObj.LastAnswerDate = null;
 				// mSubObj.DeregDate=
 
-				mSubObj.PartnerID = PartnerID;
+				mSubObj.PartnerID = mSubObj.PartnerID = GetPartnerID();
 				mSubObj.mVNPApp = mVNPApp;
 				mSubObj.UserName = UserName;
 				mSubObj.IP = IP;
+				break;
+			default :
 				break;
 		}
 	}
@@ -485,6 +485,45 @@ public class ProRegister
 		catch (Exception ex)
 		{
 			throw ex;
+		}
+	}
+
+	private int GetPartnerID() throws Exception
+	{
+		if (Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILE_ADS
+				|| Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILEADS)
+		{
+			WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
+			mTable_WapRegLog = mWapRegLog.Select(2, mSubObj.MSISDN);
+			if (mTable_WapRegLog != null && mTable_WapRegLog.GetRowCount() > 0)
+			{
+				return Integer.parseInt(mTable_WapRegLog.GetValueAt(0, "PartnerID").toString());
+			}
+		}
+		return 0;
+	}
+
+	private void Update_WapRegLog()
+	{
+		try
+		{
+			if (Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILE_ADS
+					|| Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILEADS)
+			{
+
+				if (mTable_WapRegLog == null || mTable_WapRegLog.GetRowCount() < 1)
+					return;
+				
+				mTable_WapRegLog.SetValueAt(MyConfig.Get_DateFormat_InsertDB().format(mCal_Current.getTime()), 0,
+						"RegisterDate");
+				mTable_WapRegLog.SetValueAt(WapRegLog.Status.Registered.GetValue(), 0, "StatusID");
+				WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
+				mWapRegLog.Update(1, mTable_WapRegLog.GetXML());
+			}
+		}
+		catch (Exception ex)
+		{
+			mLog.log.error(ex);
 		}
 	}
 
@@ -551,15 +590,15 @@ public class ProRegister
 
 					if (Insert_Sub())
 					{
-						if (mSubObj.mVNPApp == VNPApplication.CCOS)
+						if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 						{
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -589,16 +628,16 @@ public class ProRegister
 					}
 					if (MoveToUnSub())
 					{
-						if (mSubObj.mVNPApp == VNPApplication.CCOS)
+						if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 						{
 
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -630,16 +669,16 @@ public class ProRegister
 					}
 					if (MoveToUnSub())
 					{
-						if (mSubObj.mVNPApp == VNPApplication.CCOS)
+						if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 						{
 
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 						{
 							mMTType = MTType.RegVASDealerSuccessFree;
 						}
-						else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
@@ -673,16 +712,16 @@ public class ProRegister
 
 				if (Insert_Sub())
 				{
-					if (mSubObj.mVNPApp == VNPApplication.CCOS)
+					if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 					{
 
 						mMTType = MTType.RegCCOSSuccessFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
 					}
@@ -715,16 +754,16 @@ public class ProRegister
 
 				if (MoveToUnSub())
 				{
-					if (mSubObj.mVNPApp == VNPApplication.CCOS)
+					if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 					{
 
 						mMTType = MTType.RegCCOSSuccessFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
 					}
@@ -765,16 +804,16 @@ public class ProRegister
 				// báo lỗi
 				if (MoveToUnSub())
 				{
-					if (mSubObj.mVNPApp == VNPApplication.CCOS)
+					if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 					{
 
 						mMTType = MTType.RegCCOSSuccessNotFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASDEALER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
 					{
 						mMTType = MTType.RegVASDealerSuccessNotFree;
 					}
-					else if (mSubObj.mVNPApp == VNPApplication.VASVOUCHER)
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessNotFree;
 					}
@@ -801,6 +840,7 @@ public class ProRegister
 		{
 			// Insert vao log
 			Insert_MOLog();
+			Update_WapRegLog();
 		}
 		return AddToList();
 	}

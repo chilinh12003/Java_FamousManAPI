@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import uti.utility.MyConfig;
 import uti.utility.MyConfig.ChannelType;
-import uti.utility.MyConfig.VNPApplication;
+import uti.utility.VNPApplication;
 import uti.utility.MyConvert;
 import uti.utility.MyLogger;
 import api.process.Charge.ErrorCode;
@@ -85,7 +85,7 @@ public class ProDeregisterAll
 	MyTableModel mTableLog = null;
 
 	MyConfig.ChannelType mChannel = ChannelType.NOTHING;
-	MyConfig.VNPApplication mVNPApp = VNPApplication.NoThing;
+	VNPApplication mVNPApp = new VNPApplication();
 
 	Integer PID = 0;
 
