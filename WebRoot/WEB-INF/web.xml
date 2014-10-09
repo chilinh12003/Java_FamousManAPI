@@ -70,7 +70,7 @@
   
   <context-param>
     <param-name>VNPURLCharging</param-name>
-    <param-value>http://localhost:8082/MTraffic_DataSync_V2/VNPCharge_TEst.ashx</param-value>
+    <param-value>http://localhost:8082/MTraffic_DataSync_V2/OCG_Charge_Test.ashx</param-value>
   </context-param>
   <context-param>
     <param-name>VNPCPName</param-name>

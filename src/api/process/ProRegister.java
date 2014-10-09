@@ -806,7 +806,6 @@ public class ProRegister
 				{
 					if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.CCOS)
 					{
-
 						mMTType = MTType.RegCCOSSuccessNotFree;
 					}
 					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASDEALER)
