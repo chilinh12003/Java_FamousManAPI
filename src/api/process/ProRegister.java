@@ -116,6 +116,9 @@ public class ProRegister
 
 	Integer PID = 0;
 
+	// Nếu > 0 thì ID của partner cần pass
+	int PartnerID_Pass = 0;
+
 	public ProRegister(String MSISDN, String RequestID, String PackageName, String Promotion, String Trial,
 			String Bundle, String Note, String Channel, String AppName, String UserName, String IP) throws Exception
 	{
@@ -292,6 +295,26 @@ public class ProRegister
 		}
 		return mMTType;
 	}
+	
+	/**
+	 * Lấy thông tin MO từ VNP gửi sang
+	 */
+	private void GetMO()
+	{
+		try
+		{
+			String[] arr = Note.split("\\|");
+			if(arr.length >=2)
+			{
+				Keyword = arr[1];
+			}
+		}
+		catch(Exception ex)
+		{
+			mLog.log.error(ex);
+		}
+	}
+	
 
 	private void Init() throws Exception
 	{
@@ -488,6 +511,52 @@ public class ProRegister
 		}
 	}
 
+	/**
+	 * Chuyển Sản lượng sang PartnerID của HB
+	 * 
+	 * @param PartnerID
+	 * @return
+	 */
+	private int GetPartnerID_Pass(int PartnerID)
+	{
+		try
+		{
+			Calendar BeginDate = Calendar.getInstance();
+			Calendar EndDate = Calendar.getInstance();
+
+			BeginDate.set(Calendar.MILLISECOND, 0);
+			BeginDate.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+					mCal_Current.get(Calendar.DATE), 0, 0, 0);
+
+			EndDate.set(Calendar.MILLISECOND, 0);
+			EndDate.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+					mCal_Current.get(Calendar.DATE), 23, 59, 59);
+
+			WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
+			MyTableModel mTable_Count = mWapRegLog.Select(5, "2", Integer.toString(PartnerID), MyConfig
+					.Get_DateFormat_InsertDB().format(BeginDate.getTime()),
+					MyConfig.Get_DateFormat_InsertDB().format(EndDate.getTime()));
+			
+			if (mTable_Count.GetRowCount() > 0)
+			{
+				int PartnetCount = Integer.parseInt(mTable_Count.GetValueAt(0, "Total").toString());
+				if (PartnetCount % 10 == 2 || PartnetCount % 10 == 8)
+				{
+					PartnerID_Pass = 28;
+					return 28;
+				}
+			}
+			PartnerID_Pass = 0;
+			return PartnerID;
+		}
+		catch (Exception ex)
+		{
+			mLog.log.error(ex);
+			return PartnerID;
+		}
+
+	}
+	
 	private int GetPartnerID() throws Exception
 	{
 		if (Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILE_ADS
@@ -497,7 +566,7 @@ public class ProRegister
 			mTable_WapRegLog = mWapRegLog.Select(2, mSubObj.MSISDN);
 			if (mTable_WapRegLog != null && mTable_WapRegLog.GetRowCount() > 0)
 			{
-				return Integer.parseInt(mTable_WapRegLog.GetValueAt(0, "PartnerID").toString());
+				return GetPartnerID_Pass(Integer.parseInt(mTable_WapRegLog.GetValueAt(0, "PartnerID").toString()));
 			}
 		}
 		return 0;
@@ -513,10 +582,16 @@ public class ProRegister
 
 				if (mTable_WapRegLog == null || mTable_WapRegLog.GetRowCount() < 1)
 					return;
-				
+
 				mTable_WapRegLog.SetValueAt(MyConfig.Get_DateFormat_InsertDB().format(mCal_Current.getTime()), 0,
 						"RegisterDate");
 				mTable_WapRegLog.SetValueAt(WapRegLog.Status.Registered.GetValue(), 0, "StatusID");
+
+				if (PartnerID_Pass > 0)
+				{
+					mTable_WapRegLog.SetValueAt("PartnerID_Pass:" + Integer.toString(PartnerID_Pass), 0, "Note");
+				}
+				
 				WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
 				mWapRegLog.Update(1, mTable_WapRegLog.GetXML());
 			}
@@ -535,6 +610,8 @@ public class ProRegister
 			// Khoi tao
 			Init();
 
+			GetMO();
+			
 			// Tính toàn khuyến mãi
 			CalculatePromotion();
 
@@ -602,6 +679,11 @@ public class ProRegister
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
 						}
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+								mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+						{
+							mMTType = MTType.RegMOBILEADSSuccessFree;
+						}
 						else
 						{
 							mMTType = MTType.RegNewSuccess;
@@ -640,6 +722,11 @@ public class ProRegister
 						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
+						}
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+								mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+						{
+							mMTType = MTType.RegMOBILEADSSuccessFree;
 						}
 						else
 						{
@@ -681,6 +768,11 @@ public class ProRegister
 						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 						{
 							mMTType = MTType.RegVASVoucherSuccessFree;
+						}
+						else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+								mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+						{
+							mMTType = MTType.RegMOBILEADSSuccessFree;
 						}
 						else
 						{
@@ -725,6 +817,11 @@ public class ProRegister
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
 					}
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+							mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+					{
+						mMTType = MTType.RegMOBILEADSSuccessFree;
+					}
 					else
 					{
 						mMTType = MTType.RegNewSuccess;
@@ -766,6 +863,11 @@ public class ProRegister
 					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessFree;
+					}
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+							mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+					{
+						mMTType = MTType.RegMOBILEADSSuccessFree;
 					}
 					else
 					{
@@ -815,6 +917,11 @@ public class ProRegister
 					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.VASVOUCHER)
 					{
 						mMTType = MTType.RegVASVoucherSuccessNotFree;
+					}
+					else if (mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILE_ADS ||
+							mSubObj.mVNPApp.mApp == VNPApplication.TelcoApplication.MOBILEADS)
+					{
+						mMTType = MTType.RegMOBILEADSSuccessNotFree;
 					}
 					else
 					{

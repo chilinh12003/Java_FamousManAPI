@@ -60,6 +60,7 @@ public class ProDeregister
 	String PackageName = "";
 	String Channel = "";
 
+	String Note = "";
 	String Keyword = "HUY API";
 	String AppName = "";
 	String UserName = "";
@@ -90,7 +91,7 @@ public class ProDeregister
 
 	Integer PID = 0;
 
-	public ProDeregister(String MSISDN, String RequestID, String PackageName, String Channel, String AppName, String UserName, String IP) throws Exception
+	public ProDeregister(String MSISDN, String RequestID, String PackageName,String Note,  String Channel, String AppName, String UserName, String IP) throws Exception
 	{
 		this.MSISDN = MSISDN.trim();
 		this.RequestID = RequestID.trim();
@@ -99,7 +100,8 @@ public class ProDeregister
 		this.AppName = AppName.trim();
 		this.UserName = UserName.trim();
 		this.IP = IP.trim();
-
+		
+		this.Note = Note.trim();
 		this.mChannel = Common.GetChannelType(Channel);
 		this.mVNPApp = Common.GetApplication(AppName);
 		this.PID = MyConvert.GetPIDByMSISDN(MSISDN, LocalConfig.MAX_PID);
@@ -147,7 +149,26 @@ public class ProDeregister
 		}
 		return mMTType;
 	}
-
+	
+	/**
+	 * Lấy thông tin MO từ VNP gửi sang
+	 */
+	private void GetMO()
+	{
+		try
+		{
+			String[] arr = Note.split("\\|");
+			if(arr.length >=2)
+			{
+				Keyword = arr[1];
+			}
+		}
+		catch(Exception ex)
+		{
+			mLog.log.error(ex);
+		}
+	}
+	
 	private void AddToMOLog(MTType mMTType_Current, String MTContent_Current) throws Exception
 	{
 		try
@@ -211,9 +232,11 @@ public class ProDeregister
 	{
 		try
 		{
-			// Khoi tao
+			//Khoi tao
 			Init();
 
+			GetMO();
+			
 			MyTableModel mTable_Sub = mSub.Select(2, PID.toString(), MSISDN);
 
 			if (mTable_Sub.GetRowCount() > 0)

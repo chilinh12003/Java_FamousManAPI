@@ -146,7 +146,8 @@ public class Deregister extends HttpServlet
 
 			String RequestID = "";
 			String MSISDN = "";
-			String Keyword = "";
+			String PackageName = "";
+			String Note = "";
 			String Channel = "";
 			String application = "";
 			String username = "";
@@ -156,7 +157,9 @@ public class Deregister extends HttpServlet
 			{
 				RequestID = Common.GetValueNode(XMLRequest, "requestid").trim();
 				MSISDN = Common.GetValueNode(XMLRequest, "msisdn").trim();
-				Keyword = Common.GetValueNode(XMLRequest, "packagename").trim();
+				PackageName = Common.GetValueNode(XMLRequest, "packagename").trim();
+
+				Note = Common.GetValueNode(XMLRequest, "note").trim();
 				Channel = Common.GetValueNode(XMLRequest, "channel").trim();
 				application = Common.GetValueNode(XMLRequest, "application").trim();
 				username = Common.GetValueNode(XMLRequest, "username").trim();
@@ -175,7 +178,7 @@ public class Deregister extends HttpServlet
 				return GetResult(mMTType);
 			}
 			
-			if (!Keyword.equalsIgnoreCase(LocalConfig.PackageName))
+			if (!PackageName.equalsIgnoreCase(LocalConfig.PackageName))
 			{
 				mMTType = MTType.Invalid;
 				return GetResult(mMTType);
@@ -186,10 +189,9 @@ public class Deregister extends HttpServlet
 				return GetResult(mMTType);
 			}
 
-			ProDeregister mProcess = new ProDeregister(MSISDN, RequestID, Keyword, Channel, application, username, userip);
+			ProDeregister mProcess = new ProDeregister(MSISDN, RequestID, PackageName,Note, Channel, application, username, userip);
 
 			mMTType = mProcess.Process();
-
 		}
 		catch (Exception ex)
 		{

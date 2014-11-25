@@ -16,8 +16,8 @@ public class LocalConfig
 	public static String  MySQLPoolName = "MySQL";
 	public static String  MSSQLPoolName = "MSSQL";
 	
-	public static DBConfig mDBConfig_MSSQL = new DBConfig("MySQL");	
-	public static DBConfig mDBConfig_MySQL = new DBConfig("MSSQL");
+	public static DBConfig mDBConfig_MSSQL = new DBConfig("MSSQL");	
+	public static DBConfig mDBConfig_MySQL = new DBConfig("MySQL");
 	
 	
 	public static String SHORT_CODE = "1566";

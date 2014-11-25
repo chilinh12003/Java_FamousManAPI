@@ -250,9 +250,16 @@ public class Register extends HttpServlet
 			case RegVASVoucherSuccessNotFree:
 				mRegResult = RegResult.SucessPay;
 				break;
+			case RegMOBILEADSSuccessFree:
+				mRegResult = RegResult.SuccessFree;
+				break;
+			case RegMOBILEADSSuccessNotFree:
+				mRegResult = RegResult.SucessPay;
+				break;
 			case RegAgainSuccessNotFree:
 				mRegResult = RegResult.SucessPay;
 				break;
+				
 			case RegFail:
 				mRegResult = RegResult.Fail;
 				break;
